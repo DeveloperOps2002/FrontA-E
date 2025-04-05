@@ -1,0 +1,86 @@
+.sidebar {
+  position: fixed;        /* Fija el sidebar en la pantalla */
+  top: 60px;              /* Ubicado justo debajo del header (que tiene 60px de alto) */
+  left: 0;
+  bottom: 0;              /* Ocupa todo el alto restante */
+  width: 250px;           /* Ancho cuando está expandido */
+  background: #1e3a8a;     /* Azul oscuro */
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  margin-top: 20px;
+}
+
+.sidebar.collapsed {
+  width: 60px;            /* Ancho cuando está colapsado */
+}
+
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 10px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+li.active {
+  background-color: #2563eb;
+  font-weight: bold;
+}
+
+li:hover {
+  background-color: #3b82f6;
+}
+
+li a {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  width: 100%;
+}
+
+li a i {
+  margin-right: 10px;
+}
+
