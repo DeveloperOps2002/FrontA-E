@@ -177,22 +177,54 @@ export class UsuariosComponent implements OnInit {
   //   }
   // }
 
-  abrirModal(editando = false, usuarioExistente: any = null) {
-    // console.log('Usuario antes de abrir el modal:', usuarioExistente);
+  // abrirModal(editando = false, usuarioExistente: any = null) {
+  //   // console.log('Usuario antes de abrir el modal:', usuarioExistente);
+  //   this.modalAbierto = true;
+  //   this.editando = editando;
+
+  //   if (editando && usuarioExistente) {
+  //     this.usuario = {
+  //       ...usuarioExistente,
+  //       usuFecNacimiento: this.extraerFecha(usuarioExistente.usuFecNacimiento),
+  //       usuFecIngreso: this.extraerFecha(usuarioExistente.usuFecIngreso),
+  //       rolId: Number(usuarioExistente.rolId), // Asegúrate de que sea un número
+  //     };
+  //     // console.log('Usuario cargado para edición:', this.usuario);
+  //   } else {
+  //     this.usuario = {
+  //       usuId: '',
+  //       usuPNombre: '',
+  //       usuPApellido: '',
+  //       usuCui: '',
+  //       usuNit: '',
+  //       usuFecNacimiento: '',
+  //       usuFecIngreso: '',
+  //       usuDireccion: '',
+  //       usuTelMovil: '',
+  //       usuGenero: '',
+  //       usuEstado: '',
+  //       usuPuesto: '',
+  //       rolId: null,
+  //       usuContrasena: '',
+  //       usuEmail: '',
+  //     };
+  //   }
+  // }
+
+  abrirModal(editando = false, usuarioExistente: any = null): void {
     this.modalAbierto = true;
     this.editando = editando;
-
+  
     if (editando && usuarioExistente) {
       this.usuario = {
         ...usuarioExistente,
         usuFecNacimiento: this.extraerFecha(usuarioExistente.usuFecNacimiento),
         usuFecIngreso: this.extraerFecha(usuarioExistente.usuFecIngreso),
-        rolId: Number(usuarioExistente.rolId), // Asegúrate de que sea un número
+        rolId: Number(usuarioExistente.rolId),
       };
-      // console.log('Usuario cargado para edición:', this.usuario);
     } else {
       this.usuario = {
-        usuId: '',
+        // usuId: '',
         usuPNombre: '',
         usuPApellido: '',
         usuCui: '',
@@ -209,6 +241,9 @@ export class UsuariosComponent implements OnInit {
         usuEmail: '',
       };
     }
+  
+    // Generar el usuario automáticamente si el nombre y apellido ya están presentes
+    this.generarUsuarioId();
   }
 
   extraerFecha(fechaCompleta: string): string {
@@ -216,6 +251,94 @@ export class UsuariosComponent implements OnInit {
     // Extrae solo la parte de la fecha (yyyy-MM-dd) de la cadena completa
     return fechaCompleta.split('T')[0];
   }
+
+  // crearUsuario() {
+  //   // Validar campos obligatorios
+  //   if (
+  //     !this.usuario.usuPNombre ||
+  //     !this.usuario.usuPApellido ||
+  //     !this.usuario.usuEmail
+  //   ) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en los datos',
+  //       text: 'Todos los campos obligatorios deben llenarse.',
+  //     });
+  //     return;
+  //   }
+
+  //   if (!this.validarUsuario()) {
+  //     return;
+  //   }
+
+  //   // Validar longitud de DPI y NIT
+  //   if (this.usuario.usuCui.length !== 13) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en el DPI',
+  //       text: 'El DPI debe tener exactamente 13 caracteres.',
+  //     });
+  //     return;
+  //   }
+
+  //   if (this.usuario.usuNit.length !== 9) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en el NIT',
+  //       text: 'El NIT debe tener exactamente 9 caracteres.',
+  //     });
+  //     return;
+  //   }
+
+  //   // Validar formato de correo electrónico
+  //   const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!correoValido.test(this.usuario.usuEmail)) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en el correo',
+  //       text: 'El correo electrónico no es válido.',
+  //     });
+  //     return;
+  //   }
+
+  //   // Validar fecha de nacimiento
+  //   const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
+  //   const hoy = new Date();
+  //   if (fechaNacimiento >= hoy) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento no puede ser hoy o en el futuro.',
+  //     });
+  //     return;
+  //   }
+
+  //   // Ajustar formato de fechas antes de enviar al backend
+  //   this.usuario.usuFecNacimiento = this.usuario.usuFecNacimiento.split('T')[0];
+  //   this.usuario.usuFecIngreso = this.usuario.usuFecIngreso.split('T')[0];
+
+  //   // Crear usuario (POST)
+  //   console.log('Creando nuevo usuario...');
+  //   this.usuarioService.crearUsuario(this.usuario).subscribe(
+  //     (response) => {
+  //       Swal.fire({
+  //         icon: 'success',
+  //         title: 'Usuario creado',
+  //         text: 'El nuevo usuario ha sido registrado exitosamente.',
+  //       });
+  //       this.cargarUsuarios();
+  //       this.cerrarModal();
+  //     },
+  //     (error) => {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Error al crear',
+  //         text: 'No se pudo registrar el usuario. Revisa los datos ingresados.',
+  //       });
+  //       console.error('Error al crear usuario:', error);
+  //     }
+  //   );
+  // }
 
   crearUsuario() {
     // Validar campos obligatorios
@@ -231,11 +354,39 @@ export class UsuariosComponent implements OnInit {
       });
       return;
     }
-
-    if (!this.validarUsuario()) {
+  
+    // Validar fecha de nacimiento
+    if (!this.usuario.usuFecNacimiento) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en la fecha de nacimiento',
+        text: 'La fecha de nacimiento es obligatoria.',
+      });
       return;
     }
-
+  
+    const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
+    const hoy = new Date();
+    const fechaMaxima = new Date('2007-12-31');
+  
+    if (fechaNacimiento >= hoy) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en la fecha de nacimiento',
+        text: 'La fecha de nacimiento no puede ser hoy o en el futuro.',
+      });
+      return;
+    }
+  
+    if (fechaNacimiento > fechaMaxima) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en la fecha de nacimiento',
+        text: 'La fecha de nacimiento no puede ser posterior al 31 de diciembre de 2007.',
+      });
+      return;
+    }
+  
     // Validar longitud de DPI y NIT
     if (this.usuario.usuCui.length !== 13) {
       Swal.fire({
@@ -245,16 +396,16 @@ export class UsuariosComponent implements OnInit {
       });
       return;
     }
-
-    if (this.usuario.usuNit.length !== 13) {
+  
+    if (this.usuario.usuNit.length !== 9) {
       Swal.fire({
         icon: 'error',
         title: 'Error en el NIT',
-        text: 'El NIT debe tener exactamente 13 caracteres.',
+        text: 'El NIT debe tener exactamente 9 caracteres.',
       });
       return;
     }
-
+  
     // Validar formato de correo electrónico
     const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!correoValido.test(this.usuario.usuEmail)) {
@@ -265,23 +416,11 @@ export class UsuariosComponent implements OnInit {
       });
       return;
     }
-
-    // Validar fecha de nacimiento
-    const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
-    const hoy = new Date();
-    if (fechaNacimiento >= hoy) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error en la fecha de nacimiento',
-        text: 'La fecha de nacimiento no puede ser hoy o en el futuro.',
-      });
-      return;
-    }
-
+  
     // Ajustar formato de fechas antes de enviar al backend
     this.usuario.usuFecNacimiento = this.usuario.usuFecNacimiento.split('T')[0];
     this.usuario.usuFecIngreso = this.usuario.usuFecIngreso.split('T')[0];
-
+  
     // Crear usuario (POST)
     console.log('Creando nuevo usuario...');
     this.usuarioService.crearUsuario(this.usuario).subscribe(
@@ -304,7 +443,7 @@ export class UsuariosComponent implements OnInit {
       }
     );
   }
-
+  
   editarUsuario(usuario: any) {
     this.modalAbierto = true;
     this.editando = true;
@@ -411,6 +550,36 @@ export class UsuariosComponent implements OnInit {
       return false;
     }
 
+    if (!this.usuario.usuFecNacimiento) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en la fecha de nacimiento',
+        text: 'La fecha de nacimiento es obligatoria.',
+      });
+      return false;
+    }
+    
+    const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
+  const fechaMaxima = new Date('2007-12-31');
+  if (fechaNacimiento > fechaMaxima) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error en la fecha de nacimiento',
+      text: 'La fecha de nacimiento no puede ser posterior al 31 de diciembre de 2007.',
+    });
+    return false;
+  }
+
+  const hoy = new Date();
+  if (fechaNacimiento >= hoy) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error en la fecha de nacimiento',
+      text: 'La fecha de nacimiento no puede ser hoy o en el futuro.',
+    });
+    return false;
+  }
+
     if (this.usuario.usuCui.length !== 13) {
       Swal.fire({
         icon: 'error',
@@ -420,11 +589,20 @@ export class UsuariosComponent implements OnInit {
       return false;
     }
 
-    if (this.usuario.usuNit.length !== 13) {
+    if (this.usuario.usuNit.length !== 9) {
       Swal.fire({
         icon: 'error',
         title: 'Error en el NIT',
-        text: 'El NIT debe tener exactamente 13 caracteres.',
+        text: 'El NIT debe tener exactamente 9 caracteres.',
+      });
+      return false;
+    }
+
+    if (this.usuario.usuTelMovil.length !== 8) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en el teléfono',
+        text: 'El número telefónico debe tener exactamente 8 caracteres.',
       });
       return false;
     }
@@ -439,8 +617,8 @@ export class UsuariosComponent implements OnInit {
       return false;
     }
 
-    const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
-    const hoy = new Date();
+    
+   
     if (fechaNacimiento >= hoy) {
       Swal.fire({
         icon: 'error',
@@ -484,6 +662,29 @@ export class UsuariosComponent implements OnInit {
         });
       }
     });
+  }
+
+  generarUsuarioId(): void {
+    if (this.usuario.usuPNombre && this.usuario.usuPApellido) {
+      const nombre = this.usuario.usuPNombre.trim().toLowerCase();
+      const apellido = this.usuario.usuPApellido.trim().toLowerCase();
+  
+      // Toma las primeras 3 letras del nombre y las primeras 2 o 3 letras del apellido
+      const nombreParte = nombre.substring(0, 3);
+      const apellidoParte = apellido.length >= 3 ? apellido.substring(0, 3) : apellido.substring(0, 2);
+  
+      // Genera el usuario concatenando las partes
+      this.usuario.usuId = `${nombreParte}${apellidoParte}`;
+    }
+  }
+
+  fechaNacimientoValida(): boolean {
+    if (!this.usuario.usuFecNacimiento) {
+      return false;
+    }
+    const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
+    const fechaMaxima = new Date('2007-12-31');
+    return fechaNacimiento <= fechaMaxima;
   }
 
   // ✏️ Editar usuario

@@ -53,7 +53,8 @@
         <p class="text-center">Todos los campos con * son obligatorios</p>
         <form (ngSubmit)="guardarUsuario()">
           <div class="form-grid">
-            <div *ngIf="!editando">
+
+            <!-- <div *ngIf="!editando">
               <label for="usuId">Usuario:</label>
               <input
                 type="text"
@@ -62,9 +63,9 @@
                 name="usuId"
                 required
               />
-            </div>
+            </div> -->
 
-            <div *ngIf="editando">
+            <!-- <div *ngIf="editando">
               <label for="usuId">* Usuario:</label>
               <input
                 type="text"
@@ -73,7 +74,7 @@
                 name="usuId"
                 readonly
               />
-            </div>
+            </div> -->
 
             <div>
               <label for="nombre">* Nombre:</label>
@@ -82,13 +83,11 @@
                 id="nombre"
                 [(ngModel)]="usuario.usuPNombre"
                 name="usuPNombre"
+                (input)="generarUsuarioId()"
                 [class.error]="!usuario.usuPNombre && formSubmitted"
                 required
               />
-              <div
-                *ngIf="!usuario.usuPNombre && formSubmitted"
-                class="error-message"
-              >
+              <div *ngIf="!usuario.usuPNombre && formSubmitted" class="error-message">
                 El nombre es obligatorio.
               </div>
             </div>
@@ -100,12 +99,11 @@
                 id="apellido"
                 [(ngModel)]="usuario.usuPApellido"
                 name="usuPApellido"
+                (input)="generarUsuarioId()"
+                [class.error]="!usuario.usuPApellido && formSubmitted"
                 required
               />
-              <div
-                *ngIf="!usuario.usuPApellido && formSubmitted"
-                class="error-message"
-              >
+              <div *ngIf="!usuario.usuPApellido && formSubmitted" class="error-message">
                 El apellido es obligatorio.
               </div>
             </div>
@@ -136,27 +134,36 @@
                 id="nit"
                 [(ngModel)]="usuario.usuNit"
                 name="usuNit"
-                maxlength="13"
-                [class.error]="usuario.usuNit?.length !== 13 && usuario.usuNit"
+                maxlength="9"
+                [class.error]="usuario.usuNit?.length !== 9 && usuario.usuNit"
                 required
               />
+              <div
+                *ngIf="usuario.usuNit?.length !== 9 && usuario.usuNit"
+                class="error-message"
+              >
+                El NIT debe tener exactamente 9 caracteres.
+                </div>
             </div>
 
             <div>
-              <label for="fechaNacimiento">* Fecha de nacimiento:</label>
+              <label for="fechaNacimiento">* Fecha de Nacimiento:</label>
               <input
                 type="date"
                 id="fechaNacimiento"
                 [(ngModel)]="usuario.usuFecNacimiento"
                 name="usuFecNacimiento"
                 [max]="fechaMaximaNacimiento"
+                [class.error]="(!usuario.usuFecNacimiento || !fechaNacimientoValida()) && formSubmitted"
                 required
               />
-              <div
-                *ngIf="!usuario.usuFecNacimiento && formSubmitted"
-                class="error-message"
-              >
-                La fecha de nacimiento es obligatorio.
+              <!-- Mensaje de error si el campo está vacío -->
+              <div *ngIf="!usuario.usuFecNacimiento && formSubmitted" class="error-message">
+                La fecha de nacimiento es obligatoria.
+              </div>
+              <!-- Mensaje de error si la fecha es posterior al 31 de diciembre de 2007 -->
+              <div *ngIf="usuario.usuFecNacimiento && !fechaNacimientoValida() && formSubmitted" class="error-message">
+                La fecha de nacimiento no puede ser posterior al 31 de diciembre de 2007.
               </div>
             </div>
 
@@ -201,6 +208,7 @@
                 id="telefono"
                 [(ngModel)]="usuario.usuTelMovil"
                 name="usuTelMovil"
+                maxlength="8"
                 required
               />
               <div
@@ -209,6 +217,12 @@
               >
                 El teléfono móvil es obligatorio.
               </div>
+              <div
+                *ngIf="usuario.usuTelMovil?.length!== 8 && usuario.usuTelMovil"
+                class="error-message"
+              >
+                El teléfono móvil debe tener exactamente 8 dígitos.
+                </div>  
             </div>
 
             <div>
