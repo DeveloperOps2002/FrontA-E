@@ -9,6 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
+//Data encrypt
+import * as bcrypt from 'bcryptjs';
 
 @Component({
   selector: 'app-usuarios',
@@ -222,6 +224,8 @@ export class UsuariosComponent implements OnInit {
         usuFecIngreso: this.extraerFecha(usuarioExistente.usuFecIngreso),
         rolId: Number(usuarioExistente.rolId),
       };
+      // Dejar el campo de contraseña vacío para que el usuario pueda ingresar una nueva
+      this.usuario.usuContrasena = '';
     } else {
       this.usuario = {
         // usuId: '',
@@ -340,13 +344,185 @@ export class UsuariosComponent implements OnInit {
   //   );
   // }
 
+  // crearUsuario() {
+  //   // Validar campos obligatorios
+  //   if (
+  //     !this.usuario.usuPNombre ||
+  //     !this.usuario.usuPApellido ||
+  //     !this.usuario.usuEmail
+  //   ) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en los datos',
+  //       text: 'Todos los campos obligatorios deben llenarse.',
+  //     });
+  //     return;
+  //   }
+  
+  //   // Validar fecha de nacimiento
+  //   if (!this.usuario.usuFecNacimiento) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento es obligatoria.',
+  //     });
+  //     return;
+  //   }
+  
+  //   const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
+  //   const hoy = new Date();
+  //   const fechaMaxima = new Date('2007-12-31');
+  
+  //   if (fechaNacimiento >= hoy) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento no puede ser hoy o en el futuro.',
+  //     });
+  //     return;
+  //   }
+  
+  //   if (fechaNacimiento > fechaMaxima) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento no puede ser posterior al 31 de diciembre de 2007.',
+  //     });
+  //     return;
+  //   }
+  
+  //   // Validar longitud de DPI y NIT
+  //   if (this.usuario.usuCui.length !== 13) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en el DPI',
+  //       text: 'El DPI debe tener exactamente 13 caracteres.',
+  //     });
+  //     return;
+  //   }
+  
+  //   if (this.usuario.usuNit.length !== 9) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en el NIT',
+  //       text: 'El NIT debe tener exactamente 9 caracteres.',
+  //     });
+  //     return;
+  //   }
+  
+  //   // Validar formato de correo electrónico
+  //   const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!correoValido.test(this.usuario.usuEmail)) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en el correo',
+  //       text: 'El correo electrónico no es válido.',
+  //     });
+  //     return;
+  //   }
+  
+  //   // Ajustar formato de fechas antes de enviar al backend
+  //   this.usuario.usuFecNacimiento = this.usuario.usuFecNacimiento.split('T')[0];
+  //   this.usuario.usuFecIngreso = this.usuario.usuFecIngreso.split('T')[0];
+  
+  //   // Crear usuario (POST)
+  //   console.log('Creando nuevo usuario...');
+  //   this.usuarioService.crearUsuario(this.usuario).subscribe(
+  //     (response) => {
+  //       Swal.fire({
+  //         icon: 'success',
+  //         title: 'Usuario creado',
+  //         text: 'El nuevo usuario ha sido registrado exitosamente.',
+  //       });
+  //       this.cargarUsuarios();
+  //       this.cerrarModal();
+  //     },
+  //     (error) => {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Error al crear',
+  //         text: 'No se pudo registrar el usuario. Revisa los datos ingresados.',
+  //       });
+  //       console.error('Error al crear usuario:', error);
+  //     }
+  //   );
+  // }
+  // crearUsuario() {
+  //   // Validar campos obligatorios
+  //   if (!this.usuario.usuPNombre || !this.usuario.usuPApellido || !this.usuario.usuEmail) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en los datos',
+  //       text: 'Todos los campos obligatorios deben llenarse.',
+  //     });
+  //     return;
+  //   }
+  
+  //   // Validar fecha de nacimiento
+  //   if (!this.usuario.usuFecNacimiento) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento es obligatoria.',
+  //     });
+  //     return;
+  //   }
+  
+  //   const fechaNacimiento = new Date(this.usuario.usuFecNacimiento);
+  //   const hoy = new Date();
+  //   const fechaMaxima = new Date('2007-12-31');
+  
+  //   if (fechaNacimiento >= hoy) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento no puede ser hoy o en el futuro.',
+  //     });
+  //     return;
+  //   }
+  
+  //   if (fechaNacimiento > fechaMaxima) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error en la fecha de nacimiento',
+  //       text: 'La fecha de nacimiento no puede ser posterior al 31 de diciembre de 2007.',
+  //     });
+  //     return;
+  //   }
+  
+  //   // Cifrar la contraseña antes de enviarla
+  //   const salt = bcrypt.genSaltSync(10); // Genera un salt
+  //   this.usuario.usuContrasena = bcrypt.hashSync(this.usuario.usuContrasena, salt); // Cifra la contraseña
+  
+  //   // Ajustar formato de fechas antes de enviar al backend
+  //   this.usuario.usuFecNacimiento = this.usuario.usuFecNacimiento.split('T')[0];
+  //   this.usuario.usuFecIngreso = this.usuario.usuFecIngreso.split('T')[0];
+  
+  //   // Crear usuario (POST)
+  //   console.log('Creando nuevo usuario...');
+  //   this.usuarioService.crearUsuario(this.usuario).subscribe(
+  //     (response) => {
+  //       Swal.fire({
+  //         icon: 'success',
+  //         title: 'Usuario creado',
+  //         text: 'El nuevo usuario ha sido registrado exitosamente.',
+  //       });
+  //       this.cargarUsuarios();
+  //       this.cerrarModal();
+  //     },
+  //     (error) => {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Error al crear',
+  //         text: 'No se pudo registrar el usuario. Revisa los datos ingresados.',
+  //       });
+  //       console.error('Error al crear usuario:', error);
+  //     }
+  //   );
+  // }
   crearUsuario() {
     // Validar campos obligatorios
-    if (
-      !this.usuario.usuPNombre ||
-      !this.usuario.usuPApellido ||
-      !this.usuario.usuEmail
-    ) {
+    if (!this.usuario.usuPNombre || !this.usuario.usuPApellido || !this.usuario.usuEmail) {
       Swal.fire({
         icon: 'error',
         title: 'Error en los datos',
@@ -387,42 +563,15 @@ export class UsuariosComponent implements OnInit {
       return;
     }
   
-    // Validar longitud de DPI y NIT
-    if (this.usuario.usuCui.length !== 13) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error en el DPI',
-        text: 'El DPI debe tener exactamente 13 caracteres.',
-      });
-      return;
-    }
-  
-    if (this.usuario.usuNit.length !== 9) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error en el NIT',
-        text: 'El NIT debe tener exactamente 9 caracteres.',
-      });
-      return;
-    }
-  
-    // Validar formato de correo electrónico
-    const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!correoValido.test(this.usuario.usuEmail)) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error en el correo',
-        text: 'El correo electrónico no es válido.',
-      });
-      return;
-    }
+    // Cifrar la contraseña antes de enviarla
+    const salt = bcrypt.genSaltSync(10); // Genera un salt
+    this.usuario.usuContrasena = bcrypt.hashSync(this.usuario.usuContrasena, salt); // Cifra la contraseña
   
     // Ajustar formato de fechas antes de enviar al backend
     this.usuario.usuFecNacimiento = this.usuario.usuFecNacimiento.split('T')[0];
     this.usuario.usuFecIngreso = this.usuario.usuFecIngreso.split('T')[0];
   
     // Crear usuario (POST)
-    console.log('Creando nuevo usuario...');
     this.usuarioService.crearUsuario(this.usuario).subscribe(
       (response) => {
         Swal.fire({
